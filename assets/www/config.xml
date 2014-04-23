@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<widget xmlns     = "http://www.w3.org/ns/widgets"
+        xmlns:gap = "http://phonegap.com/ns/1.0"
+        id        = "nl.utwente.db.kickinscavengerhunt"
+        version   = "1.0.0">
+    <name>Kick-In Scavenger Hunt</name>
+
+    <description>
+         The Kick-In Scavenger Hunt is a game in Enschede as a part of this year's Kick-In. 
+    </description>
+
+    <author href="http://www.facebook.com/vdegraaff" email="v.degraaff@utwente.nl">
+        Victor de Graaff
+    </author>
+    
+
+    <icon src="icon.png"/>
+    
+    <icon src="icon/ios/icon57.png"            gap:platform="ios"        width="57" height="57" />
+    <icon src="icon/ios/icon72.png"            gap:platform="ios"        width="72" height="72" />
+    
+    <access origin="*"/>
+
+    <content src="index.html" />
+
+    <preference name="loglevel" value="DEBUG" />
+    <preference name="orientation" value="portrait" />
+    
+    <feature name="http://api.phonegap.com/1.0/file"/>
+	<feature name="http://api.phonegap.com/1.0/geolocation"/>
+	<feature name="http://api.phonegap.com/1.0/network"/>
+
+    <feature name="App">
+      <param name="android-package" value="org.apache.cordova.App"/>
+    </feature>
+    <feature name="Geolocation">
+      <param name="android-package" value="org.apache.cordova.GeoBroker"/>
+    </feature>
+    <feature name="Device">
+      <param name="android-package" value="org.apache.cordova.Device"/>
+    </feature>
+    <feature name="File">
+      <param name="android-package" value="org.apache.cordova.FileUtils"/>
+    </feature>
+    <feature name="NetworkStatus">
+      <param name="android-package" value="org.apache.cordova.NetworkManager"/>
+    </feature>
+    <feature name="Storage">
+      <param name="android-package" value="org.apache.cordova.Storage"/>
+    </feature>
+    <feature name="FileTransfer">
+      <param name="android-package" value="org.apache.cordova.FileTransfer"/>
+    </feature>
+    
+    <plugins>
+    	<plugin name="Camera" value="org.apache.cordova.CameraLauncher" />
+    	<plugin name="Camera" value="CDVCamera" />
+    </plugins>
+</widget>
