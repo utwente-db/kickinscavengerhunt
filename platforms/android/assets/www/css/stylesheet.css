@@ -1,0 +1,169 @@
+* {
+	text-align: 	center;
+	border:			0px;
+	text-decoration:none;
+	font-family: 	DejaVu Sans,Arial,Verdana;
+	margin:			0;
+	padding:		0;
+	color:			green;
+}
+
+a, a:hover, a:visited, a:active {
+	color:			green;
+	text-decoration: underline;
+}
+
+#wrapper {
+	height:			100%;
+	padding:		5px;
+	background-color:white;
+	
+	-moz-box-sizing:border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing:     border-box;
+}
+
+#welcomeImage {
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+
+#welcomeImage {
+	height:			100%;
+	width:			100%;
+	float: 			left;
+}
+
+#top {
+	height: 		50px;
+	border-bottom: 	1px solid green;
+}
+
+#menu, #envelope, #logo {
+	 height: 		50px;
+}
+
+#menu, #envelope {
+	 float: 		left;
+}
+
+#logo, #language {
+	 float: 		right;
+}
+
+#unread {
+	background-image: url("../images/unread.png");
+	position:		absolute;
+	left:			60px;
+	top:			4px;
+	z-index:		1;
+	padding-left:	36px;
+	padding-top:	8px;
+	padding-right:	10px;
+	height:			48px;
+	width:			10px;
+	color:			white;
+	font-weight:	bold;
+	display:		none;
+}
+
+.infoButton, submit,
+.infoButton *, submit * {
+	background-color: green;
+	color:			white;
+	font-weight: 	bold;
+	padding:		0.5em;
+	font-size:		20px;
+}
+
+.screen {
+	display:		none;
+}
+
+#exercises {
+	display:		block;
+}
+
+#exercises div, #messages div {
+	text-align: 	left;
+	border-bottom: 	1px solid green;
+	font-weight: 	bold;
+	padding:		0.5em;
+	font-size:		20px;
+}
+
+#messages div.unread {
+	color:			white;
+	background-color: green;
+}
+
+#exercises img {
+	height:			20px;
+	width:			20px;
+}
+
+#exercise {
+	display:	 	none;
+	float:			left;
+	width:			100%;
+}
+
+#camera {
+	margin-top: 	10px;
+	max-width:		80%;
+}
+
+.title {
+	font-size:		20px;
+	font-weight:	bold;
+	width:			100%;
+	margin-bottom:	10px;
+	margin-top:		5px;
+}
+
+#uploadSuccessImage,
+#cameraFailedImage,
+#uploadFailedImage {
+	margin-top:		10px;
+}
+
+#approveImage {
+	max-width:		100%;
+	max-height:		80%;
+}
+
+.completed {
+	font-style:		italic;
+}
+
+.star {
+	margin-right: 	5px;
+}
+
+#images img {
+	margin-top:		5px;
+	margin-right:	5px;
+	height:			100px;
+}
+
+#bigImage {
+	max-width:		100%;
+	max-height:		100%;
+	padding-top:	5px;
+}
+
+#bigImageLogo {
+	height:			50px;
+}
+
+#bigImageLogoContainer {
+	position:		absolute;
+	top:			60px;
+	z-index:		1;
+}
+
+#fadingBarsG {
+	margin-left:	auto;
+	margin-right:	auto;
+	margin-top:		200px;
+}
