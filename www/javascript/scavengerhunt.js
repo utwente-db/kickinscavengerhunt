@@ -5,28 +5,16 @@ $(document).ready(loadScavengerHunt);
 var currentLanguage = 'nl';
 
 function loadScavengerHunt() {
-	$('#language').click(switchLanguage);
 	loadLanguageItems();
+	
+	$('#language').click(toggleLanguage);
+	$('.screen').height($(window).height() - $('#top').height() - 1);
 }
 
 function loadLanguageItems() {
 	$('*[text]').each(function() { 
 					 $(this).html(getTextItem($(this).attr('text'))); 
 				   });
-}
-
-function switchLanguage() {
-	$('#language').attr('src', 'images/' + currentLanguage + '.jpg');
-	
-	if (currentLanguage == 'nl') {
-		currentLanguage = 'en';
-		textItems = textItemsEN;
-	} else {
-		currentLanguage = 'nl';
-		textItems = textItemsNL;
-	}
-	
-	loadLanguageItems();
 }
 
 function getTextItem(label) {
@@ -57,4 +45,22 @@ function getTextItem(label) {
 	}
 	
 	return textItem;
+}
+
+function toggleLanguage() {
+	$('#language').attr('src', 'images/' + currentLanguage + '.jpg');
+
+	if (currentLanguage == 'nl') {
+		textItems = textItemsEN;
+		currentLanguage = 'en';
+	} else {
+		textItems = textItemsNL;
+		currentLanguage = 'nl';
+	}
+	
+	loadLanguageItems();
+	
+	if (loadExercises != undefined) {
+		loadExercises();
+	}
 }

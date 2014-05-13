@@ -18,7 +18,7 @@ var textItemsNL =
 		  'text': 'Doe een komkommer na in het stadhuis en maak een foto'},
 	    { 'title': 'Winkelwagen',
 		  'text': 'Ga met zoveel mogelijk mensen in een winkelwagen zitten en maak een foto'},
-		{ 'title': 'Ei van Ko',
+	   { 'title': 'Ei van Ko',
 		  'text': 'Doe een dansje op het Ei van Ko en maak een foto'}
 	)
 };
@@ -27,9 +27,9 @@ var textItemsEN =
 {
 	'ABOUT_TITLE': 'About this app',
 	'ABOUT_TEXT': 'This app was created as a part of the PhD research of Victor de Graaff. For more information about this app, contact me at <a href="mailto:v.degraaff@utwente.nl">v.degraaff@utwente.nl</a>.',
-	'CAMERA_FAILED': 'Het maken van een foto is mislukt.',
-	'INFO_AGREE': 'Ik stem toe',
-	'INFO_TEXT': 'Om mee te doen aan dit spel, hebben wij jouw goedkeuring nodig voor het opnemen van het GPS signaal.<br\/> Deze informatie zal ook gebruikt worden in wetenschappelijk onderzoek naar GPS analyse.<br\/> Hierbij zullen geen gegevens worden doorgegeven waaruit te achterhalen is van wie welk signaal is.',
+	'CAMERA_FAILED': 'Taking a picture failed',
+	'INFO_AGREE': 'I agree',
+	'INFO_TEXT': 'To participate in this game, we need your approval for recording your GPS signal.<br\/> This information will also be used for scientific research on trajectory analysis.<br\/> No information on the creator of the trajectory will be transmitted.',
 	'NEXT_EXERCISE': 'Continue with the next exercise',
 	'NO_GPS_TEXT': 'No location has been found for over ten minutes. To participate in this game, GPS has to be turned on. Make sure the GPS signal is turned on again, and the game will continue automatically.',
 	'NO_GPS_TITLE': 'No GPS Signal',

@@ -1,12 +1,3 @@
-// TODO: check GPS at start of game
-// TODO: create signed APKs
-// TODO? prettier logo files
-// TODO!!! test for multiple image uploads on device
-// TODO: iOS only cleanup
-// TODO: scroll only exercises etc, not menu
-// TODO: gps upload failed: null pointer exception @ nl.utwente.db.kiss.GPSUploadServlet.storeData(GPSUploadServlet.java:46)
-
-//var SERVERS = new Array('http://localhost:8080/kiss/', 'http://farm10.ewi.utwente.nl:8080/kiss/', 'http://farm11.ewi.utwente.nl:8080/kiss/');
 var SERVERS = new Array('http://farm10.ewi.utwente.nl:8080/kiss/', 'http://farm11.ewi.utwente.nl:8080/kiss/');
 var serverId = 0;
 var deviceId;
@@ -38,9 +29,13 @@ var exerciseId = 0;
 var unreadMessages = new Array();
 
 $(document).bind('appDirectory:loaded', createGPSFile);
-$(document).bind('gps:success', gpsSuccess);
-document.addEventListener('deviceready', loadGame, false);
+$(document).bind('appDirectory:loaded', function() {
+	window.setInterval(uploadGPSFile, 60000);
+});
 
+$(document).bind('gps:success', gpsSuccess);
+
+document.addEventListener('deviceready', loadGame, false);
 document.addEventListener('deviceready', loadFileSystemOperations, false);
 document.addEventListener('deviceready', setDeviceId, false);
 
@@ -50,15 +45,16 @@ function loadGame() {
 	loadExercises();
 	loadButtons();
 	
-	window.setInterval(uploadGPSFile, 60000);
+	window.setTimeout(checkGPS, 60000);
+
 	window.setInterval(getNewMessages, 60000);
-	
 	getNewMessages();
 	
 	$(window).resize(setLogo);
 	document.addEventListener('backbutton', openPreviousScreen, false);
 
 	loadLanguageItems();
+	openScreen('exercises');
 }
 
 function setDeviceId() {
@@ -95,7 +91,6 @@ function loadButtons() {
 	$('#camera').click(takePicture);
 	$('#cameraFailedImage').click(takePicture);
 	$('#uploadFailedImage').click(uploadPicture);
-	$('#approveButton').click(uploadPicture);
 	$('#declineButton').click(openPreviousScreen);
 }
 
@@ -115,16 +110,10 @@ function cameraFailed() {
 function pictureUploadSuccess() {
 	$('#exercise_' + exerciseId).addClass('completed').off().click(openImageScreen);
 	openScreen('uploadSuccess');
-	
-//	iOS only
-//	navigator.camera.cleanup(cleanUpSuccess, cleanUpFail);
 }
 
 function uploadFailed(error, message) {
 	openScreen('uploadFailed');
-	
-//	iOS only
-//	navigator.camera.cleanup(cleanUpSuccess, cleanUpFail);
 }
 
 function cleanUpSuccess() {
@@ -142,9 +131,8 @@ function loadFileSystemOperations() {
 	startGPSTracking();
 }
 
-function closeGame() {
-	uploadGPSFile();
-	uploadAnswersFile(closeApp);
+function endGame() {
+	uploadGPSFile(closeApp);
 }
 
 function closeApp() {
@@ -155,13 +143,25 @@ function gpsActive() {
 	return new Date().getTime() <= (lastGpsSignal + 600000);
 }
 
-function uploadGPSFile() {
+function checkGPS() {
 	if (!gpsActive()) {
 		openScreen('noGPS');
+		return false;
+	}
+	
+	return true;
+}
+
+function uploadGPSFile(callback) {
+	if (!checkGPS()) {
 		return;
 	}
 	
-	uploadFile(applicationDirectory.fullPath + '/' + GPS_FILE_NAME, GPS_UPLOAD_URL, {deviceId: deviceId}, resetGPSFile);
+	if (callback == undefined) {
+		callback = resetGPSFile;
+	}
+	
+	uploadFile(GPS_FILE_URL, GPS_UPLOAD_URL, {deviceId: deviceId}, callback);
 }
 
 function resetGPSFile() {
@@ -199,6 +199,7 @@ function loadExercises() {
 	}
 	
 	$('#exercises img').click(toggleStar);
+	loadLanguageItems();
 }
 
 function loadMessages() {
@@ -222,6 +223,8 @@ function loadMessages() {
 }
 
 function openMessage() {
+	$(this).removeClass('unread');
+	
 	var id = $(this)[0].id;
 	id = id.substring(id.indexOf('_') + 1);
 	
@@ -248,16 +251,6 @@ function updateUnreadMessages() {
 	} else {
 		$('#unread').css('display', 'block');
 	}
-}
-
-function toggleLanguage() {
-	if (textItems == textItemsNL) {
-		textItems = textItemsEN;
-	} else {
-		textItems = textItemsNL;
-	}
-	
-	loadExercises();
 }
 
 function toggleStar() {
@@ -307,7 +300,8 @@ function openScreen(screenId) {
 		}
 	} else {
 		if (screenStack.length == 0) {
-			screenId = 'exercises';
+			endGame();
+			return;
 		} else {
 			// Throw away the last element, and take the previous one
 			screenStack.pop();

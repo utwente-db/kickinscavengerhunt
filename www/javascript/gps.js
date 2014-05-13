@@ -9,6 +9,7 @@ var GPS_FILE_NAME = "gpsdata.txt";
 var watchID = null;
 var gpsOn = false;
 var gpsFileWriter = null;
+var GPS_FILE_URL = null;
 
 function startGPSTracking() {
     watchID = navigator.geolocation.watchPosition(onGPSSuccess, onGPSError, {enableHighAccuracy: true, timeout: gpsTimeoutVal, maximumAge: 0 });
@@ -57,6 +58,8 @@ function createGPSFile() {
 }
 
 function createGPSFileWriter(fileEntry) {
+	GPS_FILE_URL = fileEntry.toURL();
+	
 	createFileWriter(fileEntry, gpsFileWriterCreated);
 }
 

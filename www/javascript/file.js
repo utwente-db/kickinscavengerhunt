@@ -141,7 +141,7 @@ function displayError(errorMessage) {
 }
 
 function fail(evtOrError, message) {
-	alert(error.code);
+	alert(evtOrError.code);
 	alert(message);
 	alert(evtOrError);
 	
