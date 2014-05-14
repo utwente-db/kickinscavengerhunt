@@ -141,9 +141,9 @@ function displayError(errorMessage) {
 }
 
 function fail(evtOrError, message) {
-	alert(evtOrError.code);
-	alert(message);
-	alert(evtOrError);
+	console.log(evtOrError.code);
+	console.log(message);
+	console.log(evtOrError);
 	
 	if (message != undefined) {
 		displayError(message);		

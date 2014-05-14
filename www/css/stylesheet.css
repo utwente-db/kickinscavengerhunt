@@ -53,10 +53,10 @@ a, a:hover, a:visited, a:active {
 #unread {
 	background-image: url("../images/unread.png");
 	position:		absolute;
-	left:			70px;
+	left:			60px;
 	top:			4px;
 	z-index:		1;
-	padding-left:	36px;
+	padding-left:	41px;
 	padding-top:	8px;
 	padding-right:	10px;
 	height:			48px;
@@ -64,6 +64,8 @@ a, a:hover, a:visited, a:active {
 	color:			white;
 	font-weight:	bold;
 	display:		none;
+	background-position-x: 6px;
+	background-repeat: no-repeat;
 }
 
 .infoButton, .infoButton:hover, .infoButton:visited, .infoButton:active,

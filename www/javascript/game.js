@@ -26,7 +26,7 @@ var favorites = new Array();
 var screenStack = new Array();
 
 var exerciseId = 0;
-var unreadMessages = new Array();
+var readMessages = new Array(); 
 
 $(document).bind('appDirectory:loaded', createGPSFile);
 $(document).bind('appDirectory:loaded', function() {
@@ -40,6 +40,16 @@ document.addEventListener('deviceready', loadFileSystemOperations, false);
 document.addEventListener('deviceready', setDeviceId, false);
 
 function loadGame() {
+	var readMessagesCookie = readCookie('readMessages');
+	
+	if (readMessagesCookie != undefined) {
+		readMessages = readMessagesCookie.split(',');
+		
+		if (readMessages[0] == "") {
+			readMessages.splice(0, 1);
+		}
+	}
+	
 	initURLs();
 	
 	loadExercises();
@@ -210,7 +220,11 @@ function loadMessages() {
 		var message = messages[i];
 		var messageNode = document.createElement('div');
 		
-		if (unreadMessages.indexOf(i) >= 0) {
+		console.log(readMessages);
+		console.log("" + i);
+		console.log(readMessages.indexOf("" + i));
+		
+		if (readMessages.indexOf("" + i) == -1) {
 			$(messageNode).attr('class', 'unread');
 		}
 
@@ -233,20 +247,19 @@ function openMessage() {
 	$('#messageTitle').attr('text', 'message_' + id + '_title');
 	$('#messageText').attr('text', 'message_' + id + '_text');
 	
-	var index = unreadMessages.indexOf(parseInt(id));
-	
-	if (index >= 0) {
-		unreadMessages.splice(index, 1);
-		updateUnreadMessages();
+	if (readMessages.indexOf(id) == -1) {
+		readMessages[readMessages.length] = id;
+		createCookie('readMessages', readMessages.join(','));
+		updateUnreadMessagesCounter();
 	}
 
 	openScreen('message');
 }
 
-function updateUnreadMessages() {
-	$('#unread').html(unreadMessages.length);
+function updateUnreadMessagesCounter() {
+	$('#unread').html(messages.length - readMessages.length);
 	
-	if (unreadMessages.length == 0) {
+	if (readMessages.length == messages.length) {
 		$('#unread').css('display', 'none');
 	} else {
 		$('#unread').css('display', 'block');
@@ -329,14 +342,9 @@ function getNewMessages(nrCalls) {
 }
 
 function setNewMessages(responseText) {
-	var newMessages = $.parseJSON(responseText);
+	messages = $.parseJSON(responseText);
 	
-	for (var i = messages.length; i < newMessages.length; i++) {
-		unreadMessages[unreadMessages.length] = i;
-	}
-
-	updateUnreadMessages();
-	messages = newMessages;
+	updateUnreadMessagesCounter();
 }
 
 function openImageScreen() {
@@ -424,4 +432,37 @@ function testScreen(i) {
 	setTimeout(function() { 
 				testScreen(i + 1); 
 			   }, 5000);
+}
+
+function createCookie(name,value,days) {
+	var expires = "";
+	
+	if (days) {
+		var date = new Date();
+		
+		date.setTime(date.getTime()+(days*24*60*60*1000));
+		expires = "; expires="+date.toGMTString();
+	}
+	
+	document.cookie = name+"="+value+expires+"; path=/";
+}
+
+function readCookie(name) {
+	var nameEQ = name + "=";
+
+	var ca = document.cookie.split(';');
+	
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		
+		while (c.charAt(0)==' ') {
+			c = c.substring(1,c.length);
+		}
+		
+		if (c.indexOf(nameEQ) == 0) {
+			return c.substring(nameEQ.length,c.length);
+		}
+	}
+
+	return null;
 }
