@@ -8,6 +8,7 @@
   <link type="text/css" href="css/fadingBars.css" rel="stylesheet" />
   <script type="text/javascript" src="cordova.js"></script>
   <script type="text/javascript" src="javascript/lib/jquery-1.10.1.min.js"></script>
+  <script type="text/javascript" src="javascript/lib/jquery.cookie.js"></script>
   
   <script type="text/javascript" src="javascript/data.js"></script>
   <script type="text/javascript" src="javascript/file.js"></script>
@@ -15,19 +16,23 @@
 
   <script type="text/javascript" src="javascript/scavengerhunt.js"></script>
   <script type="text/javascript" src="javascript/game.js"></script>
+
+  <!-- Bing map -->  
+  <script type="text/javascript" src="https://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&s=1"></script>
  </head>
  <body>
-  <div id="unread"></div>
   <div id="wrapper">
    <div id="top">
    	<img src="images/menu.png" id="menu"/>
    	<img src="images/envelope.png" id="envelope"/>
    	<img src="images/logo.png" id="logo"/>
    	<img src="images/en.jpg" id="language"/>
+   	<img src="images/map.png" id="mapButton"/>
    </div>
    <div id="mainContainer">
     <div id="exercises" class="screen"></div>
 	<div id="exercise" class="screen">
+		<img src="" id="exerciseImage"/>
 		<div id="exerciseTitle" class="title"></div>
 		<div id="exerciseText" class="text"></div>
 		<img src="images/camera.jpg" id="camera"/>
@@ -68,6 +73,9 @@
 		<div id="noGPSTitle" class="title" text="NO_GPS_TITLE"></div><br/>
 		<div id="noGPSText" class="text" text="NO_GPS_TEXT"></div><br/>
 	</div>
+	<div id="map" class="screen">
+		
+	</div>
 	<div id="loader" class="screen">
 		<br/><br/><br/><br/><br/><br/><br/>
 		<div id="fadingBarsG">
@@ -90,6 +98,11 @@
 		</div>
 	</div>
    </div>
+  </div>
+  <div id="unread"></div>
+  <div id="tooltip">
+		<div id="tooltipTriangle"></div>
+		<div id="tooltipInfo"></div>
   </div>
  </body>
 </html>

@@ -2,13 +2,19 @@ var FILE_SYSTEM_HOME = 'KickInScavengerHunt';
 
 $(document).ready(loadScavengerHunt);
 
-var currentLanguage = 'nl';
+var currentLanguage;
 
 function loadScavengerHunt() {
-	loadLanguageItems();
+	currentLanguage = $.cookie('lang');
+	
+	if (currentLanguage == undefined) {
+		currentLanguage = 'nl';
+	}
+	
+	toggleLanguage(currentLanguage);
 	
 	$('#language').click(toggleLanguage);
-	$('.screen').height($(window).height() - $('#top').height() - 1);
+	$('.screen').height($(document).height() - $('#top').height() - 1);
 }
 
 function loadLanguageItems() {
@@ -44,23 +50,39 @@ function getTextItem(label) {
 		textItem = messages[id][currentLanguage][titleOrText];
 	}
 	
+	if (textItem == undefined) {
+		textItem = label;
+	}
+	
 	return textItem;
 }
 
-function toggleLanguage() {
-	$('#language').attr('src', 'images/' + currentLanguage + '.jpg');
-
-	if (currentLanguage == 'nl') {
-		textItems = textItemsEN;
-		currentLanguage = 'en';
-	} else {
-		textItems = textItemsNL;
-		currentLanguage = 'nl';
+function toggleLanguage(newLanguage) {
+	if (newLanguage != 'en' && newLanguage != 'nl') {
+		newLanguage = getOtherLanguage(currentLanguage);
 	}
+	
+	$('#language').attr('src', 'images/' + getOtherLanguage(newLanguage) + '.jpg');
+
+	if (newLanguage == 'nl') {
+		textItems = textItemsNL;
+	} else {
+		textItems = textItemsEN;
+	}
+	
+	currentLanguage = newLanguage;
 	
 	loadLanguageItems();
 	
-	if (loadExercises != undefined) {
+	if (typeof(loadExercises) != 'undefined') {
 		loadExercises();
 	}
+	
+	$.cookie('lang', currentLanguage);
+	
+	$(document).trigger('language:switched');
+}
+
+function getOtherLanguage(language) {
+	return (language == 'nl') ? 'en' : 'nl';
 }

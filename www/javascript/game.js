@@ -1,6 +1,7 @@
-var SERVERS = new Array('http://farm10.ewi.utwente.nl:8080/kiss/', 'http://farm11.ewi.utwente.nl:8080/kiss/');
+var SERVERS = new Array('http://farm10.ewi.utwente.nl:8080/kiss/', 'http://farm11.ewi.utwente.nl:8080/kiss/', 'http://castle.ewi.utwente.nl:8080/kiss/');
 var serverId = 0;
 var deviceId;
+var map;
 
 var maxNrConsecutiveFails = 3;
 
@@ -8,6 +9,9 @@ var MESSAGES_URL;
 var IMAGE_LIST_URL;
 var IMAGE_URL;
 var GPS_UPLOAD_URL;
+
+var GAME_LATITUDE = 52.262296;
+var GAME_LONGITUDE = 6.793611;
 
 function initURLs() {
 	var BASE_URL = SERVERS[serverId];
@@ -26,7 +30,16 @@ var favorites = new Array();
 var screenStack = new Array();
 
 var exerciseId = 0;
-var readMessages = new Array(); 
+var readMessages = new Array();
+
+var tipsAndTricks = new Array(
+						new Array($('#wrapper').width() - 135, 29, 'CHANGE_LANGUAGE_EXPLANATION'),
+						new Array($('#wrapper').width() - 195, 29, 'MAP_EXPLANATION'),
+						new Array(87, 34, 'MESSAGES_EXPLANATION'), 
+						new Array(29, 29, 'MENU_EXPLANATION'),
+						new Array(90, 88, 'EXERCISE_EXPLANATION'),
+						new Array(16, 88, 'STAR_EXPLANATION')
+					);
 
 $(document).bind('appDirectory:loaded', createGPSFile);
 $(document).bind('appDirectory:loaded', function() {
@@ -40,7 +53,9 @@ document.addEventListener('deviceready', loadFileSystemOperations, false);
 document.addEventListener('deviceready', setDeviceId, false);
 
 function loadGame() {
-	var readMessagesCookie = readCookie('readMessages');
+	initializeMap();
+	
+	var readMessagesCookie = $.cookie('readMessages');
 	
 	if (readMessagesCookie != undefined) {
 		readMessages = readMessagesCookie.split(',');
@@ -65,6 +80,9 @@ function loadGame() {
 
 	loadLanguageItems();
 	openScreen('exercises');
+	
+	introduction();
+	$(document).on('language:switched', introduction);
 }
 
 function setDeviceId() {
@@ -91,11 +109,20 @@ function loadButtons() {
 	});
 	
 	$('#bigImage').click(function() {
-		openScreen('images');
+		// Go back one screen
+		openScreen('');
 	});
 	
 	$('#uploadSuccessImage').click(function() {
 		openScreen('exercises');
+	});
+	
+	$('#mapButton').click(function() {
+		openScreen('map');
+	});
+	
+	$('#exerciseImage').click(function() {
+		openBigImage($(this).attr('src'));
 	});
 	
 	$('#camera').click(takePicture);
@@ -220,10 +247,6 @@ function loadMessages() {
 		var message = messages[i];
 		var messageNode = document.createElement('div');
 		
-		console.log(readMessages);
-		console.log("" + i);
-		console.log(readMessages.indexOf("" + i));
-		
 		if (readMessages.indexOf("" + i) == -1) {
 			$(messageNode).attr('class', 'unread');
 		}
@@ -249,7 +272,7 @@ function openMessage() {
 	
 	if (readMessages.indexOf(id) == -1) {
 		readMessages[readMessages.length] = id;
-		createCookie('readMessages', readMessages.join(','));
+		$.cookie('readMessages', readMessages.join(','));
 		updateUnreadMessagesCounter();
 	}
 
@@ -289,9 +312,13 @@ function openExercise(id) {
 
 	$('#exerciseTitle').attr('text', 'exercise_' + id + '_title');
 	$('#exerciseText').attr('text', 'exercise_' + id + '_text');
+	$('#exerciseImage').attr('src', 'images/exercises/' + id + '.jpg');
 	
 	exerciseId = id;
 	openScreen('exercise');
+	
+	hideAllMarkers();
+	displayMarker(id);
 }
 
 function gpsSuccess() {
@@ -326,6 +353,10 @@ function openScreen(screenId) {
 	
 	$('.screen').css('display', 'none');
 	$('#' + screenId).css('display', 'block');
+	
+	if (screenId != 'exercise' && screenId != 'map') {
+		displayAllMarkers();
+	}
 }
 
 function openPreviousScreen() {
@@ -383,17 +414,19 @@ function setImages(responseText) {
 	}
 }
 
-function openBigImage() {
-	$('#bigImage').attr('src', $(this)[0].src);
+function openBigImage(src) {
+	if (typeof(src) != 'string') {
+		src = $(this).attr('src');
+	}
+
+	$('#bigImage').one("load", setLogo).attr('src', src);
 	
 	openScreen('image');
-	
-	setTimeout(setLogo, 100);
 }
 
 function setLogo() {
-	$('#bigImageLogoContainer').css({'top':  $('#bigImage').height() + 10,
-									 'left': ($('#wrapper').width() + $('#bigImage').width()) / 2 - 80});
+	$('#bigImageLogoContainer').css({'top':  $('#bigImage').height() - 50,
+									 'left': ($('#wrapper').width() + $('#bigImage').width()) / 2 - 95});
 }
 
 function connectionFailed(retryFunction, nrCalls) {
@@ -422,7 +455,6 @@ function screenTest() {
 function testScreen(i) {
 	var screens = $('.screen');
 	
-	console.log(screens[i]);
 	openScreen(screens[i].id);
 	
 	if (i == screens.length - 1) {
@@ -434,35 +466,131 @@ function testScreen(i) {
 			   }, 5000);
 }
 
-function createCookie(name,value,days) {
-	var expires = "";
+
+
+function tooltip(x, y, textItem) {
+	$('#tooltipTriangle').css({left: x - 9, top: y});
+	$('#tooltipInfo').css({top: y + 15, width: $('#wrapper').width() - 16}).attr('text', textItem);
 	
-	if (days) {
-		var date = new Date();
-		
-		date.setTime(date.getTime()+(days*24*60*60*1000));
-		expires = "; expires="+date.toGMTString();
-	}
-	
-	document.cookie = name+"="+value+expires+"; path=/";
+	loadLanguageItems();
+	$('#tooltip').off().click(closeTooltip).css({display: 'block'});
 }
 
-function readCookie(name) {
-	var nameEQ = name + "=";
-
-	var ca = document.cookie.split(';');
-	
-	for(var i=0;i < ca.length;i++) {
-		var c = ca[i];
-		
-		while (c.charAt(0)==' ') {
-			c = c.substring(1,c.length);
-		}
-		
-		if (c.indexOf(nameEQ) == 0) {
-			return c.substring(nameEQ.length,c.length);
-		}
-	}
-
-	return null;
+function closeTooltip() {
+	$('#tooltip').css({display: 'none'});
+	$(document).trigger('tooltip:closed');
 }
+
+function introduction(step) {
+	if (isNaN(step)) {
+		step = 0;
+	}
+	
+	if ((getCurrentScreen() != 'exercises') || (tipsAndTricks[step] == undefined)) {
+		return;
+	}
+	
+	var logoWidth = $('#logo').width() + 10;
+	
+	if ($('#wrapper').width() < 360) {
+		$('#logo').hide();
+		
+		logoWidth = 0;
+	}
+	
+	// Timing issue
+	tipsAndTricks[0][0] = $('#wrapper').width() - 39 - logoWidth;
+	tipsAndTricks[1][0] = $('#wrapper').width() - 110 - logoWidth;
+	
+	var tip = tipsAndTricks[step];
+	tooltip(tip[0], tip[1], tip[2]);
+	
+	// After this tip, go to the next one
+	$(document).off('tooltip:closed').on('tooltip:closed', function() {
+		introduction(step + 1);
+	});
+}
+
+function getCurrentScreen() {
+	return screenStack[screenStack.length - 1];
+}
+
+function initializeMap() {
+    var mapOptions = {
+        credentials: "AiPx2C9sZqn3lH2wWmmGCyC1PBAkCb5v0iMtWcOg1_VbBCG_CzjWQ81oSVZUa3PF",
+        mapTypeId: Microsoft.Maps.MapTypeId.road,
+        center: new Microsoft.Maps.Location(GAME_LATITUDE, GAME_LONGITUDE),
+        zoom: 15
+    };
+    
+    map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
+
+    createMapMarkers(map);
+}
+
+function createMapMarkers(map) {
+	var exercises = textItems.exercises;
+	
+	for (var i = 0; i < exercises.length; i++) {
+		var exercise = exercises[i];
+		
+		var loc = new Microsoft.Maps.Location(exercise.latitude, exercise.longitude);
+		var pin = new Microsoft.Maps.Pushpin(loc, {text: '' + (i + 1)});
+		markers[markers.length] = pin;
+		
+        pinInfobox = new Microsoft.Maps.Infobox(loc, {title: exercise.title, visible: true});
+        infoboxes[i] = pinInfobox;
+        
+        // Add a handler for the pushpin click event.
+        Microsoft.Maps.Events.addHandler(pin, 'click', displayInfobox);
+        
+        // Add the pushpin and info box to the map
+        map.entities.push(pin);
+        map.entities.push(pinInfobox);
+    }
+	
+    // Hide the info boxes when the map is moved.
+    Microsoft.Maps.Events.addHandler(map, 'viewchange', hideInfoboxes);	
+}
+
+function hideAllMarkers() {
+	for (var i = 0; i < markers.length; i++) {
+		markers[i].setOptions({ visible: false });
+	}
+}
+
+function displayMarker(markerId) {
+	markers[markerId].setOptions({ visible: true });
+}
+
+function displayAllMarkers() {
+	for (var i = 0; i < markers.length; i++) {
+		displayMarker(i);
+	}
+}
+
+var markers = [];
+var infoboxes = [];
+
+function displayInfobox(e) {
+	var index = parseInt(e.target._text) - 1;
+
+	var infobox = infoboxes[index];
+    infobox.setOptions({ visible: true });
+}
+
+function hideInfoboxes(e) {
+	for (var i = 0; i < infoboxes.length; i++) {
+		infoboxes[i].setOptions({ visible: false });
+	}
+}
+
+//if (window.location.protocol == 'file:') {
+//	alert('debug mode');
+//	// Debug mode
+//	$(document).ready(loadGame);
+//
+//	window.setTimeout(function() {
+//		$('#exercise_1').addClass('completed').off().click(openImageScreen);
+//	}, 500);
+//}
