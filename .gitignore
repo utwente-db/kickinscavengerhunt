@@ -1,2 +1,6 @@
-platforms/
 bin/
+.classpath
+.cordova/
+.project
+.settings/
+
