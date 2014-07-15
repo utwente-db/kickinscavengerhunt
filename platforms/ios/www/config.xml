@@ -92,7 +92,7 @@ x<?xml version="1.0" encoding="UTF-8"?>
     <icon src="res/icon/ios/icon-57-2x.png"         gap:platform="ios"        width="114" height="114" />
     <icon src="res/icon/ios/icon-72-2x.png"         gap:platform="ios"        width="144" height="144" />
     <icon src="res/icon/ios/icon-120.png"           gap:platform="ios"        width="120" height="120" />
-    <icon src="res/icon/ios/icon-120-2x.png"         gap:platform="ios"        width="240" height="240" />
+    <icon src="res/icon/ios/icon-120-2x.png"        gap:platform="ios"        width="240" height="240" />
     
     <icon src="res/icon/webos/icon-64.png"          gap:platform="webos" />
     <icon src="res/icon/windows-phone/icon-48.png"  gap:platform="winphone" />
@@ -110,6 +110,7 @@ x<?xml version="1.0" encoding="UTF-8"?>
     <gap:splash src="res/screen/ios/screen-ipad-landscape.png"     gap:platform="ios"     width="1024" height="768" />
     <gap:splash src="res/screen/ios/screen-iphone-portrait-568h.png"    gap:platform="ios"     width="320" height="568" />
     <gap:splash src="res/screen/ios/screen-iphone-portrait-568h-2x.png"    gap:platform="ios"     width="640" height="1136" />
+
     <gap:splash src="res/screen/windows-phone/screen-portrait.jpg" gap:platform="winphone" />
 
     <access origin="*"/>
