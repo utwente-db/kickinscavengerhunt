@@ -1,4 +1,4 @@
-/home/victor/java/workspace/kickinscavengerhunt/platforms/android/ant-build/KickInScavengerHunt-debug-unaligned.apk : \
-/home/victor/java/workspace/kickinscavengerhunt/platforms/android/ant-build/KickInScavengerHunt.ap_ \
-/home/victor/java/workspace/kickinscavengerhunt/platforms/android/ant-build/classes.dex \
-/home/victor/java/workspace/kickinscavengerhunt/platforms/android/CordovaLib/ant-build/classes.jar \
+/Users/Victor/Documents/workspace/kickinscavengerhunt/platforms/android/ant-build/KickInScavengerHunt-debug-unaligned.apk : \
+/Users/Victor/Documents/workspace/kickinscavengerhunt/platforms/android/ant-build/KickInScavengerHunt.ap_ \
+/Users/Victor/Documents/workspace/kickinscavengerhunt/platforms/android/ant-build/classes.dex \
+/Users/Victor/Documents/workspace/kickinscavengerhunt/platforms/android/CordovaLib/ant-build/classes.jar \

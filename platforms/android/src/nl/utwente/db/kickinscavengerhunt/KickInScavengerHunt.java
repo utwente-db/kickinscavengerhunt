@@ -19,12 +19,10 @@
 
 package nl.utwente.db.kickinscavengerhunt;
 
-import org.apache.cordova.Config;
-import org.apache.cordova.CordovaActivity;
-
 import android.os.Bundle;
+import org.apache.cordova.*;
 
-public class KickInScavengerHunt extends CordovaActivity
+public class KickInScavengerHunt extends CordovaActivity 
 {
     @Override
     public void onCreate(Bundle savedInstanceState)
