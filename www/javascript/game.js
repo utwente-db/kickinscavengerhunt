@@ -3,6 +3,8 @@ var serverId = 0;
 var deviceId;
 var map;
 
+var MAP_SCRIPT_URL = 'https://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&s=1';
+
 var maxNrConsecutiveFails = 3;
 
 var MESSAGES_URL;
@@ -53,8 +55,6 @@ document.addEventListener('deviceready', loadFileSystemOperations, false);
 document.addEventListener('deviceready', setDeviceId, false);
 
 function loadGame() {
-	initializeMap();
-	
 	var readMessagesCookie = $.cookie('readMessages');
 	
 	if (readMessagesCookie != undefined) {
@@ -83,6 +83,9 @@ function loadGame() {
 	
 	introduction();
 	$(document).on('language:switched', introduction);
+
+	// First load phonegap, then map
+	$.getScript(MAP_SCRIPT_URL, function() {waitForMapService(initializeMap);});
 }
 
 function setDeviceId() {
@@ -516,6 +519,9 @@ function getCurrentScreen() {
 }
 
 function initializeMap() {
+	$('#map').width($(window).width());
+	$('#map').height($(window).height() - 61);
+	
     var mapOptions = {
         credentials: "AiPx2C9sZqn3lH2wWmmGCyC1PBAkCb5v0iMtWcOg1_VbBCG_CzjWQ81oSVZUa3PF",
         mapTypeId: Microsoft.Maps.MapTypeId.road,
@@ -526,6 +532,17 @@ function initializeMap() {
     map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
 
     createMapMarkers(map);
+}
+
+function waitForMapService(callback) {
+	console.log('wait');
+
+	if (typeof(Microsoft) == 'undefined' || typeof(Microsoft.Maps) == 'undefined' || typeof(Microsoft.Maps.Location) == 'undefined') {
+		setTimeout(function() { waitForMapService(callback); }, 100);
+		return;
+	}
+
+	callback();
 }
 
 function createMapMarkers(map) {
@@ -584,6 +601,11 @@ function hideInfoboxes(e) {
 		infoboxes[i].setOptions({ visible: false });
 	}
 }
+
+$(document).ready(function() {
+	// Browser mode
+	$.ajax('cordova.js', {error: loadGame});
+});
 
 //if (window.location.protocol == 'file:') {
 //	alert('debug mode');
