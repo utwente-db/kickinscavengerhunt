@@ -15,6 +15,13 @@ function loadScavengerHunt() {
 	
 	$('#language').click(toggleLanguage);
 	$('.screen').height($(document).height() - $('#top').height() - 1);
+	
+	$('#agreeButton').click(function() {
+		openScreen('loader');
+		
+		// Open next page after timeout, otherwise loader doesn't start anymore
+		setTimeout(function() { window.location = 'game.html'; }, 100);
+	});
 }
 
 function loadLanguageItems() {
@@ -85,4 +92,39 @@ function toggleLanguage(newLanguage) {
 
 function getOtherLanguage(language) {
 	return (language == 'nl') ? 'en' : 'nl';
+}
+
+function openScreen(screenId) {
+	if ($('#noGPS').length > 0 && $('#noGPS').css('display') != 'none' && !gpsActive()) {
+		return false;
+	}
+	
+	if ($('#' + screenId).length > 0) {
+		if (screenId != 'loader') {
+			screenStack[screenStack.length] = screenId;
+		}
+	} else {
+		if (screenStack.length == 0) {
+			endGame();
+			return;
+		} else {
+			// Throw away the last element, and take the previous one
+			screenStack.pop();
+			screenId = screenStack[screenStack.length - 1];
+		}
+	}
+	
+	loadLanguageItems();
+	
+	$('.screen').css('display', 'none');
+	$('#' + screenId).css('display', 'block');
+	
+	if ((typeof(displayAllMarkers) != 'undefined') && screenId != 'exercise' && screenId != 'map') {
+		displayAllMarkers();
+	}
+	
+	if (screenId == 'map') {
+		google.maps.event.trigger(map, 'resize');
+		map.panTo(new google.maps.LatLng(GAME_LATITUDE, GAME_LONGITUDE));
+	}
 }

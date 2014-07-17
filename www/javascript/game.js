@@ -85,7 +85,7 @@ function loadGame() {
 	$(document).on('language:switched', introduction);
 
 	// First load phonegap, then map
-	$.getScript(MAP_SCRIPT_URL, function() {waitForMapService(initializeMap);});
+	$.getScript(MAP_SCRIPT_URL, loadGoogleMap);
 }
 
 function setDeviceId() {
@@ -332,36 +332,6 @@ function gpsSuccess() {
 	}
 }
 
-function openScreen(screenId) {
-	if ($('#noGPS').css('display') != 'none' && !gpsActive()) {
-		return false;
-	}
-	
-	if ($('#' + screenId).length > 0) {
-		if (screenId != 'loader') {
-			screenStack[screenStack.length] = screenId;
-		}
-	} else {
-		if (screenStack.length == 0) {
-			endGame();
-			return;
-		} else {
-			// Throw away the last element, and take the previous one
-			screenStack.pop();
-			screenId = screenStack[screenStack.length - 1];
-		}
-	}
-	
-	loadLanguageItems();
-	
-	$('.screen').css('display', 'none');
-	$('#' + screenId).css('display', 'block');
-	
-	if (screenId != 'exercise' && screenId != 'map') {
-		displayAllMarkers();
-	}
-}
-
 function openPreviousScreen() {
 	// improving readability of code
 	openScreen();
@@ -518,31 +488,52 @@ function getCurrentScreen() {
 	return screenStack[screenStack.length - 1];
 }
 
-function initializeMap() {
-	$('#map').width($(window).width());
-	$('#map').height($(window).height() - 61);
-	
-    var mapOptions = {
-        credentials: "AiPx2C9sZqn3lH2wWmmGCyC1PBAkCb5v0iMtWcOg1_VbBCG_CzjWQ81oSVZUa3PF",
-        mapTypeId: Microsoft.Maps.MapTypeId.road,
-        center: new Microsoft.Maps.Location(GAME_LATITUDE, GAME_LONGITUDE),
-        zoom: 15
-    };
-    
-    map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
+//function initializeMap() {
+//	$('#map').width($(window).width());
+//	$('#map').height($(window).height() - 61);
+//	
+//    var mapOptions = {
+//        credentials: "AiPx2C9sZqn3lH2wWmmGCyC1PBAkCb5v0iMtWcOg1_VbBCG_CzjWQ81oSVZUa3PF",
+//        mapTypeId: Microsoft.Maps.MapTypeId.road,
+//        center: new Microsoft.Maps.Location(GAME_LATITUDE, GAME_LONGITUDE),
+//        zoom: 15
+//    };
+//    
+//    map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
+//
+//    createMapMarkers(map);
+//}
+//
+//function waitForMapService(callback) {
+//	console.log('wait');
+//
+//	if (typeof(Microsoft) == 'undefined' || typeof(Microsoft.Maps) == 'undefined' || typeof(Microsoft.Maps.Location) == 'undefined') {
+//		setTimeout(function() { waitForMapService(callback); }, 100);
+//		return;
+//	}
+//
+//	callback();
+//}
 
-    createMapMarkers(map);
+function loadGoogleMap() {
+	$('#map').width($(window).width());
+	$('#map').height($(window).height());
+	
+	var script = document.createElement('script');
+	
+	script.type = 'text/javascript';
+	script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=initializeGoogleMap';
+  
+	document.body.appendChild(script);
 }
 
-function waitForMapService(callback) {
-	console.log('wait');
+function initializeGoogleMap() {
+	var mapOptions = {
+		  zoom: 15,
+		  center: new google.maps.LatLng(GAME_LATITUDE, GAME_LONGITUDE)
+	};
 
-	if (typeof(Microsoft) == 'undefined' || typeof(Microsoft.Maps) == 'undefined' || typeof(Microsoft.Maps.Location) == 'undefined') {
-		setTimeout(function() { waitForMapService(callback); }, 100);
-		return;
-	}
-
-	callback();
+	map = new google.maps.Map(document.getElementById('map'), mapOptions);
 }
 
 function createMapMarkers(map) {
