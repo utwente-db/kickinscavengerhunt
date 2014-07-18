@@ -3,7 +3,7 @@ var serverId = 0;
 var deviceId;
 var map;
 
-var MAP_SCRIPT_URL = 'https://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&s=1';
+var MAP_SCRIPT_URL = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBAtOE7g-pCJQ-e12ant8vkA_7Rz4OTL2k';
 
 var maxNrConsecutiveFails = 3;
 
@@ -85,7 +85,7 @@ function loadGame() {
 	$(document).on('language:switched', introduction);
 
 	// First load phonegap, then map
-	$.getScript(MAP_SCRIPT_URL, loadGoogleMap);
+	initMap();
 }
 
 function setDeviceId() {
@@ -488,87 +488,79 @@ function getCurrentScreen() {
 	return screenStack[screenStack.length - 1];
 }
 
-//function initializeMap() {
-//	$('#map').width($(window).width());
-//	$('#map').height($(window).height() - 61);
-//	
-//    var mapOptions = {
-//        credentials: "AiPx2C9sZqn3lH2wWmmGCyC1PBAkCb5v0iMtWcOg1_VbBCG_CzjWQ81oSVZUa3PF",
-//        mapTypeId: Microsoft.Maps.MapTypeId.road,
-//        center: new Microsoft.Maps.Location(GAME_LATITUDE, GAME_LONGITUDE),
-//        zoom: 15
-//    };
-//    
-//    map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
-//
-//    createMapMarkers(map);
-//}
-//
-//function waitForMapService(callback) {
-//	console.log('wait');
-//
-//	if (typeof(Microsoft) == 'undefined' || typeof(Microsoft.Maps) == 'undefined' || typeof(Microsoft.Maps.Location) == 'undefined') {
-//		setTimeout(function() { waitForMapService(callback); }, 100);
-//		return;
-//	}
-//
-//	callback();
-//}
+function initMap() {
+	$.ajax({
+		url: MAP_SCRIPT_URL,
+		dataType: 'script',
+		success: _loadGoogleMap,
+		error: function() {
+			alert(getTextItem('NO_MAP'));
+			setTimeout(initMap, 10000);
+		}
+	});
+}
 
-function loadGoogleMap() {
+function _loadGoogleMap() {
 	$('#map').width($(window).width());
-	$('#map').height($(window).height());
+	$('#map').height($(window).height() - 61);
 	
 	var script = document.createElement('script');
 	
 	script.type = 'text/javascript';
-	script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=initializeGoogleMap';
+	script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=_initializeGoogleMap';
   
 	document.body.appendChild(script);
 }
 
-function initializeGoogleMap() {
+function _initializeGoogleMap() {
 	var mapOptions = {
-		  zoom: 15,
+		  zoom: 16,
 		  center: new google.maps.LatLng(GAME_LATITUDE, GAME_LONGITUDE)
 	};
 
 	map = new google.maps.Map(document.getElementById('map'), mapOptions);
+	createMapMarkers();
 }
 
-function createMapMarkers(map) {
+function createMapMarkers() {
 	var exercises = textItems.exercises;
+	infowindow = new google.maps.InfoWindow();
 	
 	for (var i = 0; i < exercises.length; i++) {
 		var exercise = exercises[i];
-		
-		var loc = new Microsoft.Maps.Location(exercise.latitude, exercise.longitude);
-		var pin = new Microsoft.Maps.Pushpin(loc, {text: '' + (i + 1)});
-		markers[markers.length] = pin;
-		
-        pinInfobox = new Microsoft.Maps.Infobox(loc, {title: exercise.title, visible: true});
-        infoboxes[i] = pinInfobox;
-        
-        // Add a handler for the pushpin click event.
-        Microsoft.Maps.Events.addHandler(pin, 'click', displayInfobox);
-        
-        // Add the pushpin and info box to the map
-        map.entities.push(pin);
-        map.entities.push(pinInfobox);
+		createMarker(exercise);
     }
 	
-    // Hide the info boxes when the map is moved.
-    Microsoft.Maps.Events.addHandler(map, 'viewchange', hideInfoboxes);	
+	google.maps.event.addListener(map, 'click', function() {
+        infowindow.close();
+    });
 }
+
+function createMarker(exercise) {
+	var latlng = new google.maps.LatLng(exercise.latitude, exercise.longitude);
+	var marker = new google.maps.Marker({
+		position: latlng,
+		map: map
+	});
+	
+	markers[i] = marker;
+	
+	google.maps.event.addListener(marker, 'click', function(a, b, c) {
+		infowindow.setContent(exercise.title);
+		infowindow.open(map, marker);
+	});
+}
+
+var infowindow;
 
 function hideAllMarkers() {
 	for (var i = 0; i < markers.length; i++) {
-		markers[i].setOptions({ visible: false });
+		markers[i].setMap(null);
 	}
 }
 
 function displayMarker(markerId) {
-	markers[markerId].setOptions({ visible: true });
+	markers[markerId].setMap(map);
 }
 
 function displayAllMarkers() {
@@ -579,19 +571,6 @@ function displayAllMarkers() {
 
 var markers = [];
 var infoboxes = [];
-
-function displayInfobox(e) {
-	var index = parseInt(e.target._text) - 1;
-
-	var infobox = infoboxes[index];
-    infobox.setOptions({ visible: true });
-}
-
-function hideInfoboxes(e) {
-	for (var i = 0; i < infoboxes.length; i++) {
-		infoboxes[i].setOptions({ visible: false });
-	}
-}
 
 $(document).ready(function() {
 	// Browser mode
