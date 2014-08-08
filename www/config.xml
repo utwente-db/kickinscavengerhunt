@@ -6,10 +6,10 @@
         id        = "nl.utwente.db.kickinscavengerhunt"
         version   = "1.0.0">
 
-    <name>Kick-In Scavenger Hunt</name>
+    <name>Kick-In Discover Hengelo</name>
 
     <description>
-         The Kick-In Scavenger Hunt is a game in Enschede as a part of this year's Kick-In. 
+         This is the Kick-In Discover Hengelo app for 2014. This event will take place on August 22nd as a part of the Kick-In, welcoming the new students to the University of Twente.
     </description>
 
     <author href="http://www.facebook.com/vdegraaff" email="v.degraaff@utwente.nl">

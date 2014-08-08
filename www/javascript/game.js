@@ -3,6 +3,8 @@ var serverId = 0;
 var deviceId;
 var map;
 
+var firstExerciseId = 0;
+
 var MAP_SCRIPT_URL = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBAtOE7g-pCJQ-e12ant8vkA_7Rz4OTL2k';
 
 var maxNrConsecutiveFails = 3;
@@ -40,7 +42,8 @@ var tipsAndTricks = new Array(
 						new Array(87, 34, 'MESSAGES_EXPLANATION'), 
 						new Array(29, 29, 'MENU_EXPLANATION'),
 						new Array(90, 88, 'EXERCISE_EXPLANATION'),
-						new Array(16, 88, 'STAR_EXPLANATION')
+						new Array(16, 88, 'STAR_EXPLANATION'),
+						new Array(90, 88, 'function:createFirstExerciseExplanation')
 					);
 
 $(document).bind('appDirectory:loaded', createGPSFile);
@@ -52,9 +55,10 @@ $(document).bind('gps:success', gpsSuccess);
 
 document.addEventListener('deviceready', loadGame, false);
 document.addEventListener('deviceready', loadFileSystemOperations, false);
-document.addEventListener('deviceready', setDeviceId, false);
 
 function loadGame() {
+	setDeviceId();
+	
 	var readMessagesCookie = $.cookie('readMessages');
 	
 	if (readMessagesCookie != undefined) {
@@ -89,7 +93,13 @@ function loadGame() {
 }
 
 function setDeviceId() {
+	if (typeof(device) == 'undefined') {
+		device = {uuid: '123'};
+	}
+	
 	deviceId = device.uuid;
+	var locationID = Math.floor(parseInt(deviceId.substring(0, 1), 16) / 16 * locationIDs.length);
+	firstExerciseId = locationIDs[locationID];
 }
 
 function loadButtons() {
@@ -216,30 +226,44 @@ function resetGPSFileEntry(fileEntry) {
 function loadExercises() {
 	var exercises = textItems.exercises;
 	var exercisesNode = $('#exercises')[0];
+
 	exercisesNode.innerHTML = '';
+	
+	addExercise(exercises[firstExerciseId], firstExerciseId);
 	
 	for (i = 0; i < exercises.length; i++) {
 		var exercise = exercises[i];
-		var exerciseNode = document.createElement('div');
-		exerciseNode.id = 'exercise_' + i;
 		
-		var starNode = document.createElement('img');
-		starNode.id = 'star_' + i;
-		starNode.src = favorites.indexOf(starNode.id) >= 0 ? fullStarFile : emptyStarFile;
-		starNode.setAttribute('class', 'star');
+		if (i == firstExerciseId) {
+			continue;
+		}
 		
-		var exerciseTitleNode = document.createElement('span');
-		$(exerciseTitleNode).attr('text', 'exercise_' + i + '_title');
-		
-		exerciseNode.appendChild(starNode);
-		exerciseNode.appendChild(exerciseTitleNode);
-		exercisesNode.appendChild(exerciseNode);
-		
-		$(exerciseNode).click(openExercise);
+		addExercise(exercise, i);
 	}
 	
 	$('#exercises img').click(toggleStar);
 	loadLanguageItems();
+}
+
+function addExercise(exercise, id) {
+	var exercisesNode = $('#exercises')[0];
+	var exerciseNode = document.createElement('div');
+
+	exerciseNode.id = 'exercise_' + id;
+	
+	var starNode = document.createElement('img');
+	starNode.id = 'star_' + id;
+	starNode.src = favorites.indexOf(starNode.id) >= 0 ? fullStarFile : emptyStarFile;
+	starNode.setAttribute('class', 'star');
+	
+	var exerciseTitleNode = document.createElement('span');
+	$(exerciseTitleNode).attr('text', 'exercise_' + id + '_title');
+	
+	exerciseNode.appendChild(starNode);
+	exerciseNode.appendChild(exerciseTitleNode);
+	exercisesNode.appendChild(exerciseNode);
+	
+	$(exerciseNode).click(openExercise);
 }
 
 function loadMessages() {
@@ -537,13 +561,17 @@ function createMapMarkers() {
 }
 
 function createMarker(exercise) {
+	if (exercise.latitude == undefined) {
+		return;
+	}
+	
 	var latlng = new google.maps.LatLng(exercise.latitude, exercise.longitude);
 	var marker = new google.maps.Marker({
 		position: latlng,
 		map: map
 	});
 	
-	markers[i] = marker;
+	markers.push(marker);
 	
 	google.maps.event.addListener(marker, 'click', function(a, b, c) {
 		infowindow.setContent(exercise.title);
@@ -554,6 +582,10 @@ function createMarker(exercise) {
 var infowindow;
 
 function hideAllMarkers() {
+	if (typeof(infowindow) != 'undefined') {
+		infowindow.close();
+	}
+	
 	for (var i = 0; i < markers.length; i++) {
 		markers[i].setMap(null);
 	}
@@ -564,17 +596,33 @@ function displayMarker(markerId) {
 }
 
 function displayAllMarkers() {
+	if (typeof infowindow != 'undefined') {
+		infowindow.close();
+	}
+	
 	for (var i = 0; i < markers.length; i++) {
 		displayMarker(i);
 	}
 }
 
+function createFirstExerciseExplanation() {
+	return getTextItem('FIRST_EXERCISE') 
+			+ '<br/><br/>' 
+			+ textItems.exercises[firstExerciseId].title 
+			+ '<br/><br/>'
+			+ getTextItem('AFTER_FIRST_EXERCISE');
+}
+
 var markers = [];
-var infoboxes = [];
 
 $(document).ready(function() {
 	// Browser mode
-	$.ajax('cordova.js', {error: loadGame});
+	$.ajax('cordova.js', {error: function() {
+		alert('browser mode');
+		device = {uuid: '123'};
+		setDeviceId();
+		loadGame();
+	}});
 });
 
 //if (window.location.protocol == 'file:') {

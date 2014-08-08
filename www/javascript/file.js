@@ -60,6 +60,12 @@ function uploadFile(sourceFileURI, serverURI, params, callBackFunction, failFunc
     options.fileKey = "data";
 	options.fileName = sourceFileURI.substr(sourceFileURI.lastIndexOf('/') + 1);
     options.mimeType = "text/plain";
+    
+    // Upload failing, see http://stackoverflow.com/questions/11783985/phonegaps-filetransfer-upload-throwing-error-code-3-on-android
+    options.headers = {
+        Connection: "close"
+    };
+    options.chunkedMode = false;
 
     if (params == undefined) {
     	params = {};

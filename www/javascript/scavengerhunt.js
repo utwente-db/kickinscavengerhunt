@@ -14,7 +14,6 @@ function loadScavengerHunt() {
 	toggleLanguage(currentLanguage);
 	
 	$('#language').click(toggleLanguage);
-	$('.screen').height($(document).height() - $('#top').height() - 1);
 	
 	$('#agreeButton').click(function() {
 		openScreen('loader');
@@ -37,12 +36,20 @@ function getTextItem(label) {
 
 	var textItem = textItems[label];
 	
+	if (label.substring(0,9) == 'function:') {
+		return eval(label.substring(9) + '();');
+	}
+	
 	if (label.substring(0, 8) == 'exercise') {
 		// e.g. 11_title
 		var lastPart = label.substring(label.indexOf('_') + 1);
 		
 		var id = lastPart.substring(0, lastPart.indexOf('_'));
 		var titleOrText = lastPart.substring(lastPart.indexOf('_') + 1);
+		
+		if (id == 'undefined') {
+			stackTrace();
+		}
 		
 		textItem = textItems['exercises'][id][titleOrText];
 	}
@@ -127,4 +134,9 @@ function openScreen(screenId) {
 		google.maps.event.trigger(map, 'resize');
 		map.panTo(new google.maps.LatLng(GAME_LATITUDE, GAME_LONGITUDE));
 	}
+}
+
+function stackTrace() {
+    var err = new Error();
+    console.log(err.stack);
 }
