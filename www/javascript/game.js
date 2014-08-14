@@ -552,7 +552,14 @@ function createMapMarkers() {
 	
 	for (var i = 0; i < exercises.length; i++) {
 		var exercise = exercises[i];
-		createMarker(exercise);
+		createMarker(exercise, "008000");
+    }
+	
+	var importantLocations = textItems.importantLocations;
+
+	for (var i = 0; i < importantLocations.length; i++) {
+		var importantLocation = importantLocations[i];
+		createMarker(importantLocation, "FF0000");
     }
 	
 	google.maps.event.addListener(map, 'click', function() {
@@ -560,15 +567,21 @@ function createMapMarkers() {
     });
 }
 
-function createMarker(exercise) {
+function createMarker(exercise, pinColor) {
 	if (exercise.latitude == undefined) {
 		return;
 	}
 	
+    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34));
+	
 	var latlng = new google.maps.LatLng(exercise.latitude, exercise.longitude);
 	var marker = new google.maps.Marker({
 		position: latlng,
-		map: map
+		map: map,
+		icon: pinImage
 	});
 	
 	markers.push(marker);

@@ -139,6 +139,18 @@ var textItemsNL =
 			'title': 'Aanzoek',
 			'text': 'Vraag een voorbijganger op romantische wijze ten huwelijk'
 		}
+	),
+	'importantLocations': new Array(
+			{
+				'title': 'Fietsenstalling',
+				'latitude': 52.266601,
+				'longitude': 6.792605
+			},
+			{
+				'title': 'EHBO en Infobalie',
+				'latitude': 52.265263,
+				'longitude': 6.793072
+			}
 	)
 };
 
@@ -283,6 +295,20 @@ var textItemsEN =
 			'title': 'The proposal',
 			'text': 'Ask a passer-by in a very romantic way to marry you'
 		}
+	),
+	'importantLocations': new Array(
+			{
+				'title': 'Bike rack',
+				'latitude': 52.266601,
+				'longitude': 6.792605,
+				'iconURL': 'images/bicycle.png'
+			},
+			{
+				'title': 'Info desk',
+				'latitude': 52.265263,
+				'longitude': 6.793072,
+				'iconURL': 'images/bicycle.png'
+			}
 	)
 };
 
